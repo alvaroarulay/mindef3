@@ -16,16 +16,13 @@ class OficinasController extends Controller
     public function index(Request $request)
     {
         if (!Unidadadmin::where('estado','=','1')->count()) return redirect('/');
-        $unidad = Unidadadmin::where('estado','=','1')->first();
         $buscar = $request->buscar;
         $criterio = $request->criterio;
         if ($buscar==''){
-            $oficinas = Oficinas::select('oficina.id','oficina.codofic','oficina.nomofic','api_estado')
-            ->where('oficina.unidad','=',$unidad->unidad)->paginate(10);
+            $oficinas = Oficinas::select('oficina.id','oficina.codofic','oficina.nomofic','oficina.api_estado','oficina.observ')->paginate(10);
         }
         else{
-            $oficinas = Oficinas::select('oficina.id','oficina.codofic','oficina.nomofic','api_estado')
-            ->where('oficina.unidad','=',$unidad->unidad)
+            $oficinas = Oficinas::select('oficina.id','oficina.codofic','oficina.nomofic','oficina.api_estado','oficina.observ')
             ->where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')
             ->paginate(10);
         }
@@ -139,7 +136,7 @@ class OficinasController extends Controller
         //if (!$request->ajax()) return redirect('/');
 
         $filtro = $request->filtro;
-        $oficina = Oficinas::select('id','codofic','nomofic')->where('codofic','=', $filtro)->first();
+        $oficina = Oficinas::select('id','codofic','nomofic','observ','api_estado')->where('codofic','=', $filtro)->first();
         return response()->json(['oficina' => $oficina]);
     }
 }

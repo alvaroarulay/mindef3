@@ -86,6 +86,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/actual/repAsignaciones', 'ActualController@repAsignaciones');
         Route::get('/actual/repDevoluciones', 'ActualController@repDevoluciones');
         Route::get('/actuales/inventario', 'ActualController@buscarActivoEstado');
+        Route::get('/actuales/gcontable','ActualController@gcontable');
         
         //Route::name('print')->get('/imprimir', 'ActualController@imprimir');
         Route::post('/image/crear', 'ImageController@create')->name('image.crear');
@@ -96,7 +97,6 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/escritorio/grafica2', 'EscritorioController@grafica2');
 
         Route::get('/responsable', 'ResponsablesController@index');
-        
         Route::post('/responsable/registrar', 'ResponsablesController@store');
         Route::get('/responsable/datos', 'ResponsablesController@actualizarDatos')->name('responsable.datos');
         Route::get('/responsable/buscarResponsable', 'ResponsablesController@buscarResponsable');
@@ -104,7 +104,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::put('/responsable/actualizar', 'ResponsablesController@update');
         Route::put('/responsable/eliminar', 'ResponsablesController@delete');
         Route::get('/responsable/repResponsables', 'ResponsablesController@repResponsables');
-        
+        Route::get('/responsable/listar','ResponsablesController@listarporOficina');
 
 
         Route::get('/contable', 'CodigoContableController@index');

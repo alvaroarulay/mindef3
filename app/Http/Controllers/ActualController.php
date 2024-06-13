@@ -28,7 +28,6 @@ class ActualController extends Controller
         //if (!$request->ajax()) return redirect('/');
         if (\Auth::check()) {
             // El usuario está autenticado
-            $unidad = Unidadadmin::where('estado','=','1')->first();
             $grupocontable = CodigoContable::All();
             $buscar = $request->buscar;
             $criterio = $request->criterio;
@@ -53,7 +52,7 @@ class ActualController extends Controller
             'auxiliar.nomaux','actual.vidautil','oficina.nomofic','resp.nomresp',
             'actual.descripcion','actual.codestado','actual.estadoasignacion',
             'actual.codigosec','actual.observ','actual.codcont','actual.codaux')
-            ->where('actual.unidad','=',$unidad->unidad)->paginate(5);
+            ->distinct('actual.id')->paginate(5);
             }
             else{
             $actuales = Actual::join('codcont','actual.codcont','=','codcont.codcont')
@@ -75,7 +74,7 @@ class ActualController extends Controller
             'auxiliar.nomaux','actual.vidautil','oficina.nomofic','resp.nomresp',
             'actual.descripcion','actual.codestado','actual.estadoasignacion',
             'actual.codigosec','actual.observ','actual.codcont','actual.codaux')
-            ->where('actual.unidad','=',$unidad->unidad)
+            ->distinct('actual.id')
             ->where('actual.'.$criterio, 'like', '%'. $buscar . '%')->paginate(5);           
             }
             //return view('actuales.lista', ['actuales' => $actuales,'unidad'=>$unidad]);
@@ -294,11 +293,6 @@ class ActualController extends Controller
     }
     public function reporteActivos()
     {   
-        //$actuales = $this->actuales->obtenerActuales();
-        //if (!$request->ajax()) return redirect('/');
-        
-        $unidad = Unidadadmin::where('estado','=','1')->first();
-
         $actuales = Actual::join('codcont','actual.codcont','=','codcont.codcont')
         ->join('auxiliar',function ($join) {
         $join->on('actual.codaux', '=', 'auxiliar.codaux');
@@ -319,7 +313,7 @@ class ActualController extends Controller
         'auxiliar.nomaux','actual.vidautil','oficina.nomofic','resp.nomresp',
         'actual.descripcion','estado.nomestado','actual.estadoasignacion',
         'actual.codigosec','actual.observ','actual.codcont','actual.codaux')
-        ->where('actual.unidad','=',$unidad->unidad)->get();     
+        ->distinct('actual.id')->get();     
         //return view('actuales.lista', ['actuales' => $actuales,'unidad'=>$unidad]);
         return response()->json(['actuales'=>$actuales]);
     }
@@ -350,7 +344,7 @@ class ActualController extends Controller
                     'actual.codigosec','actual.observ')
                     ->where('actual.codresp','=',$codresp)
                     ->where('actual.codofic','=',$codofic)->get();
-        return response()->json(['actuales'=>$actuales]);
+        return response()->json(['actuales'=>$actuales,'total'=>$actuales->count()]);
     }
     public function updateAsignacion(Request $request){
         $data = $request->data;
@@ -393,11 +387,11 @@ class ActualController extends Controller
             return response()->json(['message' => 'Datos Actualizados Correctamente!!!']);
     }
     public function repAsignaciones(Request $request){
-        $codcont = $request->codcont;
         Date::setLocale('es');
         $fechaTitulo = Date::now()->format('l j F Y');
         $fechDerecha = Date::now()->format('d/M/Y');
-        if($codcont == 0){
+        if($request->data==''){
+            $codcont = $request->codcont;
             $datos = Actual::join('auxiliar',function ($join) {
                     $join->on('actual.codaux', '=', 'auxiliar.codaux');
                         $join->on('actual.unidad', '=', 'auxiliar.unidad');
@@ -407,38 +401,49 @@ class ActualController extends Controller
                 ->select('actual.codigo','actual.codaux','auxiliar.nomaux','estado.nomestado', 'actual.descripcion',)
                 ->where('actual.codresp','=',$request->codresp)
                 ->where('actual.codofic','=',$request->codofic)->get();
+            $total = $datos->count();
         }else{
-            $datos = Actual::join('auxiliar',function ($join) {
+            $arraycodcont = explode(",", $request->data);
+            $datos=[];
+            $actuales = Actual::join('auxiliar',function ($join) {
                 $join->on('actual.codaux', '=', 'auxiliar.codaux');
                     $join->on('actual.unidad', '=', 'auxiliar.unidad');
                     $join->on('actual.codcont', '=', 'auxiliar.codcont');
             })
             ->join('estado','actual.codestado','=','estado.id')
-            ->select('actual.codigo','actual.codaux','auxiliar.nomaux','estado.nomestado', 'actual.descripcion',)
+            ->select('actual.codigo','actual.codaux','auxiliar.nomaux','estado.nomestado', 'actual.descripcion','actual.codcont')
             ->where('actual.codresp','=',$request->codresp)
             ->where('actual.codofic','=',$request->codofic)
-            ->where('actual.codcont','=',$codcont)
             ->get();
-        }
-       
 
+            for ($i=0; $i < count($arraycodcont); $i++) {
+                for($j=0; $j < count($actuales); $j++){
+                    
+                    if($arraycodcont[$i] == $actuales[$j]->codcont){
+                        $datos[]=$actuales[$j];
+                        //array_push($datos, $actuales[$j]);
+                    }
+                }
+            }
+            $total = count($datos);
+        }
         $responsable = Responsables::join('oficina','resp.codofic','=','oficina.codofic')
                                     ->join('cla_depts','resp.cod_exp','=','cla_depts.id')
                                     ->select('resp.nomresp','oficina.nomofic','resp.cargo','oficina.codofic','resp.ci','cla_depts.sigla')
                                     ->where('resp.codresp','=',$request->codresp)
                                     ->where('resp.codofic','=',$request->codofic)->first();
-        $total = $datos->count();
+        
         $pdf=Pdf::loadView('plantillapdf.repAsignacion',['datos'=>$datos,'responsable'=>$responsable,'fechaTitulo'=>$fechaTitulo,'fechaDerecha'=>$fechDerecha,'total'=>$total]);
         $pdf->set_paper(array(0,0,800,617));
         return $pdf->download();
         
     }
     public function repDevoluciones(Request $request){
-        $codcont = $request->codcont;
         Date::setLocale('es');
         $fechaTitulo = Date::now()->format('l j F Y');
         $fechDerecha = Date::now()->format('d/M/Y');
-        if($codcont == 0){
+        if($request->data==''){
+            $codcont = $request->codcont;
             $datos = Actual::join('auxiliar',function ($join) {
                     $join->on('actual.codaux', '=', 'auxiliar.codaux');
                         $join->on('actual.unidad', '=', 'auxiliar.unidad');
@@ -448,25 +453,37 @@ class ActualController extends Controller
                 ->select('actual.codigo','actual.codaux','auxiliar.nomaux','estado.nomestado', 'actual.descripcion',)
                 ->where('actual.codresp','=',$request->codresp)
                 ->where('actual.codofic','=',$request->codofic)->get();
+            $total = $datos->count();
         }else{
-            $datos = Actual::join('auxiliar',function ($join) {
+            $arraycodcont = explode(",", $request->data);
+            $datos=[];
+            $actuales = Actual::join('auxiliar',function ($join) {
                 $join->on('actual.codaux', '=', 'auxiliar.codaux');
                     $join->on('actual.unidad', '=', 'auxiliar.unidad');
                     $join->on('actual.codcont', '=', 'auxiliar.codcont');
             })
             ->join('estado','actual.codestado','=','estado.id')
-            ->select('actual.codigo','actual.codaux','auxiliar.nomaux','estado.nomestado', 'actual.descripcion',)
+            ->select('actual.codigo','actual.codaux','auxiliar.nomaux','estado.nomestado', 'actual.descripcion','actual.codcont')
             ->where('actual.codresp','=',$request->codresp)
             ->where('actual.codofic','=',$request->codofic)
-            ->where('actual.codcont','=',$codcont)
             ->get();
+
+            for ($i=0; $i < count($arraycodcont); $i++) {
+                for($j=0; $j < count($actuales); $j++){
+                    
+                    if($arraycodcont[$i] == $actuales[$j]->codcont){
+                        $datos[]=$actuales[$j];
+                        //array_push($datos, $actuales[$j]);
+                    }
+                }
+            }
+            $total = count($datos);
         }
         $responsable = Responsables::join('oficina','resp.codofic','=','oficina.codofic')
                                     ->join('cla_depts','resp.cod_exp','=','cla_depts.id')
                                     ->select('resp.nomresp','oficina.nomofic','resp.cargo','oficina.codofic','resp.ci','cla_depts.sigla')
                                     ->where('resp.codresp','=',$request->codresp)
                                     ->where('resp.codofic','=',$request->codofic)->first();
-        $total = $datos->count();
         $pdf=Pdf::loadView('plantillapdf.repDevolucion',['datos'=>$datos,'responsable'=>$responsable,'fechaTitulo'=>$fechaTitulo,'fechaDerecha'=>$fechDerecha,'total'=>$total]);
         $pdf->set_paper(array(0,0,800,617));
         return $pdf->download();
@@ -493,5 +510,15 @@ class ActualController extends Controller
                 ],
                 'actuales'=>$actuales,
                 ];
+    }
+    public function gcontable(Request $request){
+        $codresp = $request->codresp;
+        $codofic = $request->codofic;
+        $gcontables = Actual::join('codcont','codcont.codcont','=','actual.codcont')
+                        ->select('codcont.codcont','codcont.nombre')
+                        ->where('actual.codresp','=',$codresp)
+                        ->where('actual.codofic','=',$codofic)
+                        ->distinct('actual.codcont')->get();
+        return response()->json(['gcontables'=>$gcontables]);
     }
 }

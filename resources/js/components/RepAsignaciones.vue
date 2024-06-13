@@ -65,14 +65,21 @@
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-6">
-                    <p>Grupo Contable:</p>
-                  </div>
-                  <div class="col-md-6">
-                    <select class="form-select" v-model="codcont" @change="onChange($event)">
-                        <option value="0">Todos</option>
-                        <option v-for="gcont in arrayContables" :key="gcont.codcont" :value="gcont.codcont" v-text="gcont.nombre"></option>
-                    </select>        
-                  </div>                
+                    <div class="form-check">
+                      <label class="form-check-label mb-2">
+                        <input  class="form-check-input" type="checkbox" v-model="todos">  TODOS
+                      </label>
+                    </div>
+                    <div class="form-check" v-for="gcont in arrayContables" :key="gcont.codcont">
+                      
+                      <label class="form-check-label mb-2" v-if="todos==true">
+                        <input  class="form-check-input" type="checkbox" :value="gcont.codcont" v-model="checkContables" disabled>  {{ gcont.nombre }}
+                      </label>
+                      <label class="form-check-label mb-2" v-if="todos==false">
+                        <input  class="form-check-input" type="checkbox" :value="gcont.codcont" v-model="checkContables">  {{ gcont.nombre }}
+                      </label>
+                    </div>
+                  </div>             
                 </div>
                 
               </div>
@@ -173,6 +180,8 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      checkContables:[],
+      todos:true,
       cod_resp:0,
       cod_ofi:0,
       ci:'',
@@ -180,6 +189,7 @@ export default {
       codigoTable:'',
       codcont:0,
       descripcionTable:'',
+      value: [],
       arrayResponsable:[],
       arrayResponsableTodos:[],
       arrayActivo:[],
@@ -246,7 +256,8 @@ export default {
             me.oficina=me.arrayResponsable.nomofic;
             me.cod_ofi=me.arrayResponsable.codofic;
             me.cod_resp=me.arrayResponsable.codresp;
-            this.buscarActivo();
+            me.buscarActivo();
+            me.listarGrupoContable(me.arrayResponsable.codresp,me.arrayResponsable.codofic);
         })
         .catch(function (error) {
             console.log(error);
@@ -301,6 +312,7 @@ export default {
         this.cod_ofi=data.codofic;
         this.cod_resp=data.codresp;
         this.buscarActivo();
+        this.listarGrupoContable(data.codresp,data.codofic);
     },
     cambiarPagina(page,buscar,criterio){
         let me = this;
@@ -309,44 +321,54 @@ export default {
         //Envia la petición para visualizar la data de esa página
         me.listarResponsable(page,buscar,criterio);
     },
+    listarGrupoContable (codresp,codofic){
+        let me=this;
+        var url= '/actuales/gcontable?codresp='+ codresp + '&codofic=' + codofic ;
+        axios.get(url).then(function (response) {
+            console.log(response);
+            var respuesta= response.data;
+            me.arrayContables = respuesta.gcontables;
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+    },
+     onChange(event) {
+        this.codcont=event.target.value;
+    },
     registrarAsignacion(){
       if(this.cod_resp == 0){
         swal.fire('Seleccione un Responsable','','error')
       }else if(this.actuales.length == 0){
         swal.fire('el Responsable no tiene activos','','error')
       }
-      else{
+      else if(this.checkContables.length == 0){
         let me = this;
         window.open('http://192.168.20.60/actual/repAsignaciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp + '&codcont='+ me.codcont + '','_blank');
+      }
+      else{
+        let me = this;
+        window.open('http://192.168.20.60/actual/repAsignaciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp + '&data='+ me.checkContables + '','_blank');
       }
     },
     registrarDevolucion(){
       if(this.cod_resp == 0){
         swal.fire('Seleccione un Responsable','','error')
       }
-      else{
+      else if(this.checkContables.length == 0){
         let me = this;
         window.open('http://192.168.20.60/actual/repDevoluciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp + '&codcont='+ me.codcont +  '','_blank');
       }
+      else{
+        let me = this;
+        window.open('http://192.168.20.60/actual/repDevoluciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp + '&data='+ me.checkContables +  '','_blank');
+      }
     },
-    listarGrupoContable (){
-        let me=this;
-        var url= '/actuales';
-        axios.get(url).then(function (response) {
-            var respuesta= response.data;
-            me.arrayContables = respuesta.grupocontable;
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
-    },
-    onChange(event) {
-        this.codcont=event.target.value;
-    },
+    
+   
   },
 
   mounted() {
-    this.listarGrupoContable();
   }
 }
 </script>

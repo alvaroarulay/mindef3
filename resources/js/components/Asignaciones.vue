@@ -128,34 +128,35 @@
                   </div>
                 <div class="row">
                   <div class="form-group tile">
-                      <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-sm">
+
+                      <div class="table-responsive table-fixed">
+                        <table class="table">
                           <thead>
-                            <th>Opciones</th>
-                            <th>Código</th>
-                            <th>Descripción</th>
-                            <th>Oficina</th>
-                            <th>Estado</th>
+                            <th class="col-xs-2">Opciones</th>
+                            <th class="col-xs-2">Código</th>
+                            <th class="col-xs-2">Descripción</th>
+                            <th class="col-xs-2">Oficina</th>
+                            <th class="col-xs-2">Estado</th>
                           </thead>
                           <tbody v-if="actuales.length">
                               <tr v-for="(detalle,index) in actuales" :key="detalle.id">
-                                  <td>
+                                  <td class="col-xs-2">
                                    <button  @click="moverALista2(index)" type="button" class="btn btn-success btn-sm"><i class="bi bi-arrow-right-circle"></i></button>
                                   </td>
-                                  <td v-text="detalle.codigo"></td>
-                                  <td v-text="detalle.descripcion"></td>
-                                  <td v-text="detalle.nomofic"></td>
-                                  <td>
-                                <div v-if="detalle.codestado === 1">
-                                    <span class="me-1 badge badge-pill bg-success">Bueno</span>
-                                </div>
-                                <div v-else-if="detalle.codestado === 2">
-                                    <span class="me-1 badge badge-pill bg-warning">Regular</span>
-                                </div>
-                                <div v-else>
-                                    <span class="me-1 badge badge-pill bg-danger">Malo</span>
-                                </div>
-                            </td>
+                                  <td class="col-xs-2" v-text="detalle.codigo"></td>
+                                  <td class="col-xs-2" v-text="detalle.descripcion"></td>
+                                  <td class="col-xs-2" v-text="detalle.nomofic"></td>
+                                  <td class="col-xs-2">
+                                        <div v-if="detalle.codestado === 1">
+                                            <span class="me-1 badge badge-pill bg-success">Bueno</span>
+                                        </div>
+                                        <div v-else-if="detalle.codestado === 2">
+                                            <span class="me-1 badge badge-pill bg-warning">Regular</span>
+                                        </div>
+                                        <div v-else>
+                                            <span class="me-1 badge badge-pill bg-danger">Malo</span>
+                                        </div>
+                                    </td>
                               </tr>
                           </tbody>
                           <tbody v-else>
@@ -164,7 +165,12 @@
                                       NO hay Activos asignados
                                   </td>
                               </tr>
-                          </tbody>        
+                          </tbody> 
+                          <tfoot>
+                                <tr>
+                                    <th colspan="5">Total Activos: <strong>{{ total1 }}</strong></th>
+                                </tr>
+                            </tfoot>       
                         </table>
                     </div>
                   </div>
@@ -196,7 +202,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="form-group tile">
-                            <div class="table-responsive">
+                            <div class="table-responsive table-fixed">
                             <table class="table table-bordered table-striped table-hover table-sm">
                                 <thead>
                                     <th >Opciones</th>
@@ -233,6 +239,11 @@
                                         </td>
                                     </tr>
                                 </tbody> 
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="5">Total Activos: <strong>{{ total2 }}</strong></th>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -417,9 +428,8 @@ export default {
   data() {
     return {
         
-        deadAreaColor: "#DDDDDD",
-        maxRows: 100,
-        freezeFirstColumn: false,
+      total1:0,
+      total2:0,
       cod_resp:0,
       cod_ofi:0,
       cod_resp2:0,
@@ -520,6 +530,7 @@ export default {
             me.oficina2=me.arrayResponsable2.nomofic;
             me.cod_ofi2=me.arrayResponsable2.codofic;
             me.cod_resp2=me.arrayResponsable2.codresp;
+            me.buscarActivo2();
         })
         .catch(function (error) {
             console.log(error);
@@ -554,6 +565,7 @@ export default {
           swal.fire('el Responsable no tiene Activos','','error')
         }
         me.actuales= res.data.actuales;
+        me.total1=res.data.total;
         }
       ).catch((e)=>{
         console.log(e);
@@ -579,6 +591,7 @@ export default {
       var url = '/actuales/buscarActivoResp?codofic=' + me.cod_ofi2 + '&codresp='+ me.cod_resp2;
       axios.get(url).then((res)=>{
         me.actuales2= res.data.actuales;
+        me.total2=res.data.total;
         }
       ).catch((e)=>{
         console.log(e);
@@ -588,18 +601,26 @@ export default {
     moverALista2(index) {
       const item = this.actuales.splice(index, 1)[0];
       this.actuales2.push(item);
+      this.total2=this.total2+1;
+      this.total1=this.total1-1;
     },
     //nuevo responsable
     moverALista1(index) {
       const item = this.actuales2.splice(index, 1)[0];
       this.actuales.push(item);
+      this.total1=this.total1+1;
+      this.total2=this.total2-1;
     },
     mover1() {
       this.actuales2.push(...this.actuales);
+      this.total2=this.total1+this.total2;
+      this.total1=0;
       this.actuales = [];
     },
     mover2(){
       this.actuales.push(...this.actuales2);
+      this.total1=this.total1+this.total2;
+      this.total2=0;
       this.actuales2 = [];
     },
     cancelarAsignacion1(){
@@ -658,20 +679,20 @@ export default {
         this.nomresp=data.nomresp;
         this.cargo=data.cargo;
         this.oficina=data.nomofic;
-        this.modal=0;
         this.cod_ofi=data.codofic;
         this.cod_resp=data.codresp;
         this.buscarActivo();
+        this.modal=0;
     },
     agregarDetalleModal2(data){
         this.ci2=data.ci;
         this.nomresp2=data.nomresp;
         this.cargo2=data.cargo;
         this.oficina2=data.nomofic;
-        this.modal2=0;
         this.cod_ofi2=data.codofic;
         this.cod_resp2=data.codresp;
         this.buscarActivo2();
+        this.modal2=0;
     },
     registrarAsignacion1(){
         if (this.cod_ofi==0 & this.cod_resp==0) {
@@ -707,10 +728,32 @@ export default {
             });
         }
     },
-    
   },
   mounted() {
    
   }
 }
 </script>
+<style>
+.table-fixed {
+  max-height: 400px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.table-fixed thead th,
+.table-fixed tfoot th {
+    position: sticky;
+    top: 0;
+    background: #fff; /* Fondo blanco para los encabezados */
+    z-index: 1; /* Asegura que los encabezados estén por encima del contenido */
+    align-items: center;
+}
+.table-fixed thead th {
+    top: 0; /* Encabezado fijo en la parte superior */
+}
+
+.table-fixed tfoot th {
+    bottom: 0; /* Pie fijo en la parte inferior */
+}
+</style>  
