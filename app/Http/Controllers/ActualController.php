@@ -51,6 +51,7 @@ class ActualController extends Controller
             ->select('actual.id','actual.unidad','actual.codigo','codcont.nombre',
             'auxiliar.nomaux','actual.vidautil','oficina.nomofic','resp.nomresp',
             'actual.descripcion','actual.codestado','actual.estadoasignacion',
+            'actual.dia','actual.mes','actual.año','actual.costo','actual.costo_ant',
             'actual.codigosec','actual.observ','actual.codcont','actual.codaux')
             ->distinct('actual.id')->paginate(5);
             }
@@ -73,6 +74,7 @@ class ActualController extends Controller
             ->select('actual.id','actual.unidad','actual.codigo','codcont.nombre',
             'auxiliar.nomaux','actual.vidautil','oficina.nomofic','resp.nomresp',
             'actual.descripcion','actual.codestado','actual.estadoasignacion',
+            'actual.dia','actual.mes','actual.año','actual.costo','actual.costo_ant',
             'actual.codigosec','actual.observ','actual.codcont','actual.codaux')
             ->distinct('actual.id')
             ->where('actual.'.$criterio, 'like', '%'. $buscar . '%')->paginate(5);           
@@ -435,7 +437,7 @@ class ActualController extends Controller
         
         $pdf=Pdf::loadView('plantillapdf.repAsignacion',['datos'=>$datos,'responsable'=>$responsable,'fechaTitulo'=>$fechaTitulo,'fechaDerecha'=>$fechDerecha,'total'=>$total]);
         $pdf->set_paper(array(0,0,800,617));
-        return $pdf->download();
+        return $pdf->stream();
         
     }
     public function repDevoluciones(Request $request){

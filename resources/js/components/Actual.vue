@@ -22,29 +22,33 @@
             <div class="col-md-12">
               <div class="tile">
                 <div class="tile-body table-responsive">
-                  <table class="table table-hover table-bordered" id="sampleTable">
+                  <table class="table table-hover table-sm  table-striped table-bordered" >
                     <thead class="thead-light">
                       <tr>
-                        <th>&nbsp;ACCIONES&nbsp;</th>
-                        <th>UNIDAD</th>
-                        <th>CÓDIGO</th>
-                        <th>GRUPO CONTABLE</th>
-                        <th>AUXLIAR</th>
-                        <th>VIDA ÚTIL</th>
-                        <th>OFICINA</th>
-                        <th>RESPONSABLE</th>
-                        <th>DESCRIPCIÓN</th>
-                        <th>ESTADO</th>
-                        <th>ASIGNACIÓN</th>
+                        <th scope="col">&nbsp;ACCIONES&nbsp;</th>
+                        <th scope="col">UNIDAD</th>
+                        <th scope="col">CÓDIGO</th>
+                        <th scope="col">GRUPO CONTABLE</th>
+                        <th scope="col">AUXLIAR</th>
+                        <th scope="col">VIDA ÚTIL</th>
+                        <th scope="col">OFICINA</th>
+                        <th scope="col">RESPONSABLE</th>
+                        <th scope="col">DESCRIPCIÓN</th>
+                        <th scope="col">FECHA DE INCORPORACIÓN</th>
+                        <th scope="col">VALOR ACTUAL</th>
+                        <th scope="col">VALOR INICIAL</th>
+                        <th scope="col">ID BIEN</th>
+                        <th scope="col">ESTADO</th>
+                        <th scope="col">ASIGNACIÓN</th>
                       </tr>
                     </thead>
                     <tbody v-if="arrayArticulo !== 0">
                         <tr v-for="articulo in arrayArticulo" :key="articulo.id">
-                            <td>
+                            <th scope="row">
                                 <button type="button" @click="mostrarEditar(articulo.id)" class="btn btn-success btn-sm"><i class="fa fa-eye"></i></button> 
                                 <button type="button" @click="abrirModal('articulo','actualizar',articulo)" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i></button>
                                 
-                            </td>
+                            </th>
                             <td v-text="articulo.unidad"></td>
                             <td v-text="articulo.codigo"></td>
                             <td v-text="articulo.nombre"></td>
@@ -52,6 +56,10 @@
                             <td v-text="articulo.vidautil"></td>
                             <td v-text="articulo.nomofic"></td>
                             <td v-text="articulo.nomresp"></td>
+                            <td v-text="articulo.descripcion"></td>
+                            <td>{{ articulo.dia + '/' + articulo.mes + '/' + articulo.año }}</td>
+                            <td>{{ articulo.costo.toLocaleString('es-BO') + ',00' }}</td>
+                            <td>{{ articulo.costo_ant.toLocaleString('es-BO') + ',00' }}</td>
                             <td v-text="articulo.descripcion"></td>
                             <td>
                                 <div v-if="articulo.codestado === 1">
@@ -213,7 +221,6 @@
     
     <script>
         import axios from 'axios';
-       
         export default {
             data (){
                 return {

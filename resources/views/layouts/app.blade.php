@@ -58,10 +58,18 @@
     <script src="{{ asset('js/app.js') }}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-    <script src="{{ asset('js/main.js') }}" defer></script>  
+    <script src="{{ asset('js/main.js') }}" defer></script> 
+    
+    <!-- Page specific javascripts-->
+    <link rel="stylesheet" href="https://cdn.datatables.net/v/bs5/dt-1.13.4/datatables.min.css">
+    <!-- Data table plugin-->
+    <script src="{{ asset('js/plugins/jquery.dataTables.min.js') }}" defer></script>
+    <script src="{{ asset('js/plugins/dataTables.bootstrap.min.js') }}" defer></script>
     @yield('scripts')
     <!--The javascript plugin to display page loading on top-->
     <script src="{{ asset('js/plugins/pace.min.js') }}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    
   
   </body>

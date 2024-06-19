@@ -173,6 +173,32 @@
             </div>
             <!-- /.modal-dialog -->
       </div>
+      <div class="modal fade" tabindex="-1" :class="{'mostrar' : modalpdf}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true" data-target=".bd-example-modal-lg">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Acta de Asignación</h4>
+                        <button type="button" class="close btn btn-sm btn-danger" @click="cerrarModalpdf()" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                          <iframe
+                            :src="pdf"
+                            frameBorder="0"
+                            scrolling="auto"
+                            height="768"
+                            width="1024"
+                        ></iframe>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="cerrarModalpdf()">Cerrar</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+      </div>
     </main>
 </template>
 <script>
@@ -180,6 +206,8 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      pdf:'',
+      modalpdf:0,
       checkContables:[],
       todos:true,
       cod_resp:0,
@@ -344,12 +372,18 @@ export default {
       }
       else if(this.checkContables.length == 0){
         let me = this;
-        window.open('http://192.168.20.60/actual/repAsignaciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp + '&codcont='+ me.codcont + '','_blank');
+        me.pdf ='http://mindef3.test/actual/repAsignaciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp + '&codcont='+ me.codcont + '';
+        me.modalpdf = 1;
       }
       else{
         let me = this;
-        window.open('http://192.168.20.60/actual/repAsignaciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp + '&data='+ me.checkContables + '','_blank');
+        me.pdf ='http://mindef3.test/actual/repAsignaciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp + '&data='+ me.checkContables + '';
+        me.modalpdf = 1;
       }
+    },
+    cerrarModalpdf(){
+      this.modalpdf = 0;
+      this.pdf = '';
     },
     registrarDevolucion(){
       if(this.cod_resp == 0){
@@ -357,11 +391,11 @@ export default {
       }
       else if(this.checkContables.length == 0){
         let me = this;
-        window.open('http://192.168.20.60/actual/repDevoluciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp + '&codcont='+ me.codcont +  '','_blank');
+        me.pdf='http://mindef3.test/actual/repDevoluciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp + '&codcont='+ me.codcont +  '';
       }
       else{
         let me = this;
-        window.open('http://192.168.20.60/actual/repDevoluciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp + '&data='+ me.checkContables +  '','_blank');
+        me.pdf='http://mindef3.test/actual/repDevoluciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp + '&data='+ me.checkContables +  '';
       }
     },
     
