@@ -14,36 +14,28 @@ class AuxiliaresController extends Controller
    
     public function index(Request $request)
     {
-        if (!Unidadadmin::where('estado','=','1')->count()) return redirect('/');
-        $unidad = Unidadadmin::where('estado','=','1')->first();
-       
+        $totalaux = Auxiliares::where('auxiliar.codcont','=',$request->codcont)->count();
+
+        
         $buscar = $request->buscar;
         $criterio = $request->criterio;
         
         if ($buscar==''){
             $auxiliares = Auxiliares::join('codcont','auxiliar.codcont','=','codcont.codcont')
-            ->select('auxiliar.id','auxiliar.nomaux','codcont.nombre')
-            ->where('auxiliar.unidad','=',$unidad->unidad)->paginate(10);
+            ->select('auxiliar.id','auxiliar.codaux','auxiliar.nomaux','codcont.nombre','codcont.codcont')
+            ->where('auxiliar.codcont','=',$request->codcont)->get();
         }
         else{
             $auxiliares = Auxiliares::join('codcont','auxiliar.codcont','=','codcont.codcont')
-            ->select('auxiliar.id','auxiliar.nomaux','codcont.nombre')
-            ->where('auxiliar.unidad','=',$unidad->unidad)
-            ->where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')
-            ->paginate(10);
+            ->select('auxiliar.id','auxiliar.codaux','auxiliar.nomaux','codcont.nombre','codcont.codcont')
+            ->where('auxiliar.codcont','=',$request->codcont)
+            ->where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->get();
         }
         
 
         return [
-            'pagination' => [
-                'total'        => $auxiliares->total(),
-                'current_page' => $auxiliares->currentPage(),
-                'per_page'     => $auxiliares->perPage(),
-                'last_page'    => $auxiliares->lastPage(),
-                'from'         => $auxiliares->firstItem(),
-                'to'           => $auxiliares->lastItem(),
-            ],
-            'auxiliares' => $auxiliares
+            'auxiliares' => $auxiliares,
+            'totalaux' => $totalaux
         ];
     }
     public function selectAuxiliar($id){
@@ -56,8 +48,8 @@ class AuxiliaresController extends Controller
         return response()->json(['auxiliares'=>$auxiliares]);
     }
     public function update(Request $request){
-        //if (!$request->ajax()) return redirect('/');
-        $auxiliar = Auxiliares::find($request->id);
+        
+        $auxiliar = Auxiliares::findOrFail($request->id);
         $auxiliar->nomaux = $request->nomaux;
         $auxiliar->codcont = $request->codcont;
         $auxiliar->save();

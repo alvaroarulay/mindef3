@@ -85,38 +85,39 @@ class ResponsablesController extends Controller
     }
     public function store(Request $request)
     {
-        $unidad = Unidadadmin::select('unidad')->where('estado','=','1')->first();
-        $codofic = Responsables::where('codofic','=',$request->codofic)->count();
+        $unidad = Unidadadmin::select('unidad')->where('estado','=','1')->get();
         $fecha = Carbon::now()->format('Ymd');
 
-        $responsable = new Responsables();
-        $responsable->entidad='0020';
-        $responsable->unidad=$unidad->unidad;
-        $responsable->codofic = $request->codofic;
-        $responsable->codresp = $codofic + 1;
-        $responsable->nomresp = $request->nomresp;
-        $responsable->cargo = $request->cargo;
-        $responsable->observ = $request->observ;
-        $responsable->ci = $request->ci;
-        $responsable->feult = $fecha;
-        $responsable->usuar = \Auth::user()->username;
-        $responsable->cod_exp = $request->expedido;
-        $responsable->api_estado = 1;
-        $responsable->estado = $request->estado;
-        $responsable->custodio = 0;
-        $responsable->save();
-
-        try {
-           
-           $table = new TableEditor(
+   try { 
+    
+        $table = new TableEditor(
             public_path('vsiaf/dbfs/RESP.DBF',['encoding' => 'cp1252']),
             [
                 'editMode' => TableEditor::EDIT_MODE_CLONE, //default
             ]
             );
+        for ($i=0; $i<count($unidad);$i++){
+            $codofic = Responsables::where('codofic','=',$request->codofic)->where('unidad','=',$unidad[$i]->unidad)->count();
+            $responsable = new Responsables();
+            $responsable->entidad='0020';
+            $responsable->unidad=$unidad[$i]->unidad;
+            $responsable->codofic = $request->codofic;
+            $responsable->codresp = $codofic + 1;
+            $responsable->nomresp = $request->nomresp;
+            $responsable->cargo = $request->cargo;
+            $responsable->observ = $request->observ;
+            $responsable->ci = $request->ci;
+            $responsable->feult = $fecha;
+            $responsable->usuar = \Auth::user()->username;
+            $responsable->cod_exp = $request->expedido;
+            $responsable->api_estado = 1;
+            $responsable->estado = $request->estado;
+            $responsable->custodio = 0;
+            $responsable->save();
+
             $record = $table->appendRecord();
-            $record->set('entidad', '0081');
-            $record->set('unidad',$unidad->unidad);
+            $record->set('entidad', '0020');
+            $record->set('unidad',$unidad[$i]->unidad);
             $record->set('codofic',$request->codofic);
             $record->set('codresp',$codofic + 1);
             $record->set('nomresp',$request->nomresp);
@@ -126,16 +127,13 @@ class ResponsablesController extends Controller
             $record->set('usuar',\Auth::user()->username);
             $record->set('cod_exp',$request->expedido);
             $record->set('api_estado',1);
-            
-            $table
-                ->writeRecord()
-                ->save()
-                ->close();
+            $table->writeRecord()->save();
+        }
+            $table->close();
+            return response()->json(['message' => 'Datos Guardados Correctamente!!!']);   
         } catch (Exception $e) {
             return response()->json(['message' => 'Excepción capturada: '+  $e->getMessage()]);
         }
-        
-        return response()->json(['message' => 'Datos Actualizados Correctamente!!!']);
     }
 
     public function update(Request $request)
@@ -278,25 +276,35 @@ class ResponsablesController extends Controller
     }
     public function listarporOficina(Request $request){
         $codofic = $request->codofic;
-        
-        $responsables = Responsables::join('cla_depts','resp.cod_exp','=', 'cla_depts.id')
-        ->select('resp.id','resp.codofic','resp.codresp','resp.nomresp','resp.cargo','resp.estado',
-        'resp.ci','cla_depts.sigla','resp.api_estado','resp.cod_exp')
-        ->where('resp.codofic','=',$codofic)->orderBy('id', 'ASC')
-        ->paginate(5);
-
-        return [
-            'pagination' => [
-                'total'        => $responsables->total(),
-                'current_page' => $responsables->currentPage(),
-                'per_page'     => $responsables->perPage(),
-                'last_page'    => $responsables->lastPage(),
-                'from'         => $responsables->firstItem(),
-                'to'           => $responsables->lastItem(),
-            ],
-            'responsables' => $responsables,
-            'total'=>$responsables->count()
-        ];
+        $unidad = $request->unidad;
+        $buscar = $request->buscar;
+        $criterio = $request->criterio;
+        if($buscar==''){
+            $responsables = Responsables::join('cla_depts','resp.cod_exp','=', 'cla_depts.id')
+            ->select('resp.id','resp.codofic','resp.codresp','resp.nomresp','resp.cargo','resp.estado',
+            'resp.ci','cla_depts.sigla','resp.api_estado','resp.cod_exp')
+            ->where('resp.codofic','=',$codofic)
+            ->where('resp.unidad','=',$unidad)
+            ->orderBy('id', 'ASC')
+            ->get();
+             return [
+                'responsables' => $responsables,
+                'total'=>$responsables->count()
+                ];
+        }else{
+            $responsables = Responsables::join('cla_depts','resp.cod_exp','=', 'cla_depts.id')
+            ->select('resp.id','resp.codofic','resp.codresp','resp.nomresp','resp.cargo','resp.estado',
+            'resp.ci','cla_depts.sigla','resp.api_estado','resp.cod_exp')
+            ->where('resp.codofic','=',$codofic)
+            ->where('resp.unidad','=',$unidad)
+            ->where('resp.'.$criterio, 'like', '%'. $buscar . '%')
+            ->orderBy('id', 'ASC')
+            ->get();
+             return [
+                'responsables' => $responsables,
+                'total'=>$responsables->count()
+                ];
+        }
     }
     
 }

@@ -35,8 +35,6 @@
                         <th scope="col">RESPONSABLE</th>
                         <th scope="col">DESCRIPCIÓN</th>
                         <th scope="col">FECHA DE INCORPORACIÓN</th>
-                        <th scope="col">VALOR ACTUAL</th>
-                        <th scope="col">VALOR INICIAL</th>
                         <th scope="col">ID BIEN</th>
                         <th scope="col">ESTADO</th>
                         <th scope="col">ASIGNACIÓN</th>
@@ -58,8 +56,6 @@
                             <td v-text="articulo.nomresp"></td>
                             <td v-text="articulo.descripcion"></td>
                             <td>{{ articulo.dia + '/' + articulo.mes + '/' + articulo.año }}</td>
-                            <td>{{ articulo.costo.toLocaleString('es-BO') + ',00' }}</td>
-                            <td>{{ articulo.costo_ant.toLocaleString('es-BO') + ',00' }}</td>
                             <td v-text="articulo.descripcion"></td>
                             <td>
                                 <div v-if="articulo.codestado === 1">

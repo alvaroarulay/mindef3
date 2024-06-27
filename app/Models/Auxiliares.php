@@ -12,24 +12,16 @@ class Auxiliares extends Model
     use HasFactory;
     protected $table = "auxiliar";
     protected $fillable = [
+        'id',
         'entidad',
         'unidad', 
         'codcont',
         'codaux',
         'nomaux',
         'observ',
-        'feult',
         'usuar',
     ];
-    protected $hidden = ['id'];
-    public function obtenerAuxiliares()
-    {
-        return Auxiliares::all();
-    }
-    public function obtenerAuxiliarPorId($id)
-    {
-        return Auxiliares::find($id);
-    }
+   
     public function actualizarDatos(){
         $auxiliares=Auxiliares::all();
         foreach ($auxiliares as $auxiliar) {

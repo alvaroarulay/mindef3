@@ -13,6 +13,7 @@
         <li class="treeview"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="bi bi-cash-coin"></i><span class="app-menu__label">&nbsp;&nbsp;Activos</span><i class="treeview-indicator fa fa-angle-right"></i></a>
           <ul class="treeview-menu">
             <li @click="menu=2"><a class="treeview-item" href="#"><i class="icon fa fa-circle-o"></i> Activos Fijos</a></li>
+            <li @click="menu=23"><a class="treeview-item" href="#"><i class="icon fa fa-circle-o"></i> Bajas</a></li>
             <li @click="menu=3"><a class="treeview-item" href="#"><i class="icon fa fa-circle-o"></i> Inventario Rápido</a></li>
           </ul>
         </li>
@@ -63,6 +64,7 @@
         <li class="treeview"><a class="app-menu__item" href="#" data-toggle="treeview"><i class="bi bi-cash-coin"></i><span class="app-menu__label">&nbsp;&nbsp;Activos</span><i class="treeview-indicator fa fa-angle-right"></i></a>
           <ul class="treeview-menu">
             <li @click="menu=2"><a class="treeview-item" href="#"><i class="icon fa fa-circle-o"></i> Activos Fijos</a></li>
+            <li @click="menu=23"><a class="treeview-item" href="#"><i class="icon fa fa-circle-o"></i> Bajas</a></li>
             <li @click="menu=3"><a class="treeview-item" href="#"><i class="icon fa fa-circle-o"></i> Inventario Rápido</a></li>
           </ul>
         </li>
@@ -99,5 +101,9 @@
        </ul>
        @else
     @endif
+    @else
+    <main>
+        <p>Sesión Expirada, por favor  <a href="{{ route('login.perform') }}">Inicie Sesión</a></p>
+    </main>
 @endif
     </aside>

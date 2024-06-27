@@ -13,13 +13,24 @@ use Illuminate\Support\Facades\DB;
 
 class CodigoContableController extends Controller
 {
-     public function index()
+    public function index(Request $request)
     {
-        if (!Unidadadmin::where('estado','=','1')->count()) return redirect('/');
-        $codigos = CodigoContable::All();
-        return [
-            'codigos' => $codigos
-        ];
+        $unidad = $request->id;
+        if($unidad == 2){
+            $codigos = CodigoContable::join('actual','codcont.codcont','=','actual.codcont')
+            ->select('codcont.id','codcont.codcont','codcont.nombre','codcont.vidautil')
+            ->distinct('codcont.codcont')
+            ->get();
+            return [ 'codigos' => $codigos ];
+        }
+        elseif($unidad == 3){
+            $codigos = CodigoContable::join('bajas','codcont.codcont','=','bajas.codcont')
+            ->select('codcont.id','codcont.codcont','codcont.nombre','codcont.vidautil')
+            ->distinct('codcont.codcont')
+            ->get();
+            return [ 'codigos' => $codigos ];
+        }
+        
     }
     public function auxiliar(Request $request){
         if(isset($request->id)){

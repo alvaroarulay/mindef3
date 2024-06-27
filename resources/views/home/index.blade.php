@@ -13,6 +13,9 @@
     <template v-if="menu==2">
         <actuales></actuales>
     </template>
+    <template v-if="menu==23">
+        <bajas></bajas>
+    </template>
 
     <template v-if="menu==3">
         <inventrap></inventrap>  
@@ -180,7 +183,23 @@
             </div>
         </main>
     </template>
-    @else
-    @endif
+@else
+@endif
+@else
+<template>
+    <main>
+        <p>Sesión Expirada, por favor  <a href="{{ route('login.perform') }}">Inicie Sesión</a></p>
+    </main>
+</template>
+<template v-if="menu==2">
+<main>
+        <p>Sesión Expirada, por favor  <a href="{{ route('login.perform') }}">Inicie Sesión</a></p>
+    </main>
+    </template>
+    <template v-if="menu==23">
+    <main>
+        <p>Sesión Expirada, por favor  <a href="{{ route('login.perform') }}">Inicie Sesión</a></p>
+    </main>
+    </template>
 @endif
 @endsection

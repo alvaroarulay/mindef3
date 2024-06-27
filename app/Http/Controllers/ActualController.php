@@ -523,4 +523,55 @@ class ActualController extends Controller
                         ->distinct('actual.codcont')->get();
         return response()->json(['gcontables'=>$gcontables]);
     }
+    public function auxiliar(Request $request){
+        $codcont = $request->codcont;
+        $codaux = $request->codaux;
+        $buscar = $request->buscar;
+        $criterio = $request->criterio;
+        if($buscar==''){
+            $actuales = Actual::select('id','codigo','descripcion as descrip')
+            ->where('codcont','=',$codcont)->where('codaux','=',$codaux)->get();
+            return response()->json(['actuales'=>$actuales,'totalactuales'=>$actuales->count()]);
+        }else{
+            if($criterio=='codigo'){
+            $actuales = Actual::select('id','codigo','descripcion as descrip')
+            ->where('codcont','=',$codcont)
+            ->where('codaux','=',$codaux)
+            ->where('actual.'.$criterio, 'like', '%'. $buscar . '%')
+            ->get();
+            return response()->json(['actuales'=>$actuales,'totalactuales'=>$actuales->count()]);
+            }
+            else{
+                $actuales = Actual::select('id','codigo','descripcion as descrip')
+                ->where('codcont','=',$codcont)
+                ->where('codaux','=',$codaux)
+                ->where('actual.'.$criterio.'cion', 'like', '%'. $buscar . '%')
+                ->get();
+                return response()->json(['actuales'=>$actuales,'totalactuales'=>$actuales->count()]);
+            }
+        }
+    }
+    public function responsable(Request $request){
+        $codofic = $request->codofic;
+        $codresp = $request->codresp;
+        $buscar = $request->buscar;
+        $criterio = $request->criterio;
+        $unidad = $request->unidad;
+        if($buscar==''){
+            $actuales = Actual::select('id','codigo','descripcion')
+            ->where('codofic','=',$codofic)
+            ->where('codresp','=',$codresp)
+            ->where('unidad','=',$unidad)
+            ->get();
+            return response()->json(['actuales'=>$actuales,'totalactuales'=>$actuales->count()]);
+        }else{
+            $actuales = Actual::select('id','codigo','descripcion')
+            ->where('codofic','=',$codofic)
+            ->where('codresp','=',$codresp)
+            ->where('unidad','=',$unidad)
+            ->where('actual.'.$criterio, 'like', '%'. $buscar . '%')
+            ->get();
+            return response()->json(['actuales'=>$actuales,'totalactuales'=>$actuales->count()]);
+        }
+    }
 }

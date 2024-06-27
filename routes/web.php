@@ -60,8 +60,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         //Route::get('/codcont/actualizar', 'CodigoContableController@actualizar')->name('actualizar');
         //Route::post('/codcont/crear', [CodigoContableController::class, 'store']);
         //Route::get('/codcont/eliminar/{id}', [CodigoContableController::class, 'destroy']);
-
+        
         Route::get('/unidad', 'UnidadadminController@index')->name('unidad');
+        Route::get('/unidad/select','UnidadadminController@selectUnidad');
         Route::put('/unidad/actualizar', 'UnidadadminController@update');
   
         
@@ -87,6 +88,11 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         Route::get('/actual/repDevoluciones', 'ActualController@repDevoluciones');
         Route::get('/actuales/inventario', 'ActualController@buscarActivoEstado');
         Route::get('/actuales/gcontable','ActualController@gcontable');
+        Route::get('/actuales/auxiliar', 'ActualController@auxiliar');
+        Route::get('/actuales/responsable','ActualController@responsable');
+
+        Route::get('/bajas', 'BajasController@index')->name('bajas');
+        Route::get('/bajas/auxiliar', 'BajasController@auxiliar');
         
         //Route::name('print')->get('/imprimir', 'ActualController@imprimir');
         Route::post('/image/crear', 'ImageController@create')->name('image.crear');
@@ -113,8 +119,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
 
         Route::get('/auxiliar', 'AuxiliaresController@index');
         Route::get('/auxiliar/{id}', 'AuxiliaresController@selectAuxiliar');
-        Route::get('/auxiliar/datos', 'AuxiliaresController@actualizarDatos')->name('auxiliar.datos');
-        Route::put('/auxiliar/update', 'AuxiliaresController@update')->name('auxiliar.update');
+        Route::get('/auxiliar/datos', 'AuxiliaresController@actualizarDatos');
+        Route::put('/auxiliar/update', 'AuxiliaresController@update');
 
         Route::get('/rol', 'RolesController@index');
         Route::get('/rol/selectRol', 'RolesController@selectRol');

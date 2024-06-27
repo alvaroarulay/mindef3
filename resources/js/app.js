@@ -23,6 +23,7 @@ import RepAsig from './components/RepAsignaciones.vue'
 import RepLogs from './components/RepLogs.vue'
 import HistorialAsig from './components/HistorialAsignaciones.vue'
 import bbdd from './components/bbdd.vue'
+import bajas from './components/Bajas.vue'
 
 const app = createApp({ 
   setup() {
@@ -56,6 +57,7 @@ app.component("repasignaciones",RepAsig);
 app.component("replogs",RepLogs);
 app.component("historialasignaciones",HistorialAsig);
 app.component("bbdd",bbdd);
+app.component("bajas",bajas);
 const vfm = createVfm()
 app.use(vfm)
   .mount('#app')

@@ -57,4 +57,8 @@ class UnidadadminController extends Controller
          
          return response()->json(['message' => 'Datos Actualizados Correctamente!!!']);
     }
+    public function selectUnidad(){
+        $unidad = Unidadadmin::select('id','unidad','descrip')->where('estado','=',1)->get();
+        return['unidad'=>$unidad];
+    }
 }
