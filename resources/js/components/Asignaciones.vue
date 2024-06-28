@@ -704,7 +704,7 @@ export default {
             'codofic2':this.cod_ofi,
         }).then((response)=>{
           Swal.fire(response.data.message, "", "success");
-          window.open('http://192.168.20.60/actual/repAsignaciones?codofic=' + this.cod_ofi + '&codresp='+ this.cod_resp +  '','_blank');
+          window.open('http://mindef3.test/actual/repAsignaciones?codofic=' + this.cod_ofi + '&codresp='+ this.cod_resp +  '','_blank');
           this.cancelarAsignacion1();
         }).catch((error)=>{
             console.log(error);
@@ -721,7 +721,7 @@ export default {
             'codofic2':this.cod_ofi2,
             }).then((response)=>{
             Swal.fire(response.data.message, "", "success");
-            window.open('http://192.168.20.60/actual/repAsignaciones?codofic=' + this.cod_ofi2 + '&codresp='+ this.cod_resp2 +  '','_blank');
+            window.open('http://mindef3.test/actual/repAsignaciones?codofic=' + this.cod_ofi2 + '&codresp='+ this.cod_resp2 +  '','_blank');
             this.cancelarAsignacion2();
             }).catch((error)=>{
                 console.log(error);

@@ -344,7 +344,7 @@ export default {
           'data': this.actuales,
       }).then((response)=>{
         Swal.fire(response.data.message, "", "success");
-        window.open('http://192.168.20.60/actual/repDevoluciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp +  '','_blank');
+        window.open('http://mindef3.test/actual/repDevoluciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp +  '','_blank');
         this.cerrarModal();
       }).catch((error)=>{
           console.log(error);

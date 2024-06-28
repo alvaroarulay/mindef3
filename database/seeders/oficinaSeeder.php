@@ -20,7 +20,7 @@ class oficinaSeeder extends Seeder
         while ($record = $table->nextRecord()) {
             DB::table('oficina')->insert([
             'entidad' => $record->get('entidad'),
-            'unidad' => $record->get('unidad'),
+            'unidad' => 'BAJAS',
             'codofic' => $record->get('codofic'),
             'nomofic' => $record->get('nomofic'),
             'feult' => $record->get('feult'),

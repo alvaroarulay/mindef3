@@ -280,7 +280,7 @@ export default {
       }
       else{
         let me = this;
-        window.open('http://192.168.20.60/actual/repDevoluciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp +  '','_blank');
+        window.open('http://mindef3.test/actual/repDevoluciones?codofic=' + me.cod_ofi + '&codresp='+ me.cod_resp +  '','_blank');
       }
     }
   },

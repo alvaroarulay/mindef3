@@ -1,9 +1,18 @@
 <template>
     <main class="app-content">
+        <div class="app-title row">
+                <div class="col-md-8">
+                    <h1><i class="bi bi-collection"></i> Unidad: {{ unidad }}</h1> 
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" @change="onChangeUnidad($event)" v-model="idunidad">
+                        <option v-for="unidad in arrayUnidad" :value="unidad.unidad" v-text="unidad.descrip"></option>
+                    </select>
+                </div>
+        </div>
         <div class="app-title">
-              <h1><i class="fa fa-th-list"></i> Articulos</h1>
-              <button type="submit" @click="revisarNuevos()" class="btn btn-primary"><i class="fa fa-list-alt"></i> Actualizar Datos</button>
-                    
+            <h1><i class="fa fa-th-list"></i> Articulos</h1>
+            <button type="submit" @click="revisarNuevos()" class="btn btn-primary"><i class="fa fa-list-alt"></i> Actualizar Datos</button>
         </div>
         <div class="form-group row">
             <div class="col-md-6">
@@ -56,7 +65,7 @@
                             <td v-text="articulo.nomresp"></td>
                             <td v-text="articulo.descripcion"></td>
                             <td>{{ articulo.dia + '/' + articulo.mes + '/' + articulo.año }}</td>
-                            <td v-text="articulo.descripcion"></td>
+                            <td v-text="articulo.cod_rube"></td>
                             <td>
                                 <div v-if="articulo.codestado === 1">
                                     <span class="me-1 badge badge-pill bg-success">Bueno</span>
@@ -232,10 +241,14 @@
                     popUp: false,
                     idArticulo:0,
 
+                    idunidad:'MD01',
+                    unidad:'MINISTERIO DE DEFENSA',
+
                     arrayContables : [],
                     arrayAuxiliares : [],
                     selectedImages: [],
                     imagenes: [],
+                    arrayUnidad:[],
 
                     nombre : '',
                     
@@ -293,6 +306,19 @@
                 }
             },
             methods : {
+                listarUnidad (){
+                    let me=this;
+                    var url= '/unidad/select';
+                    axios.get(url).then( (response) =>{
+                        var respuesta= response.data;
+                        me.arrayUnidad = respuesta.unidad;
+                        //me.listarContables(me.idunidad);
+                        //me.listarAuxiliar(1,me.codcont);
+                    })
+                    .catch( (error)=> {
+                        console.log(error);
+                    });
+                },
                 listarbusqueda(page,buscar,criterio){
                     if (this.buscar=='') {
                         Swal.fire('Escriba un texto','','error');
@@ -302,9 +328,10 @@
                 listarArticulo (page,buscar,criterio){
                     let me=this;
                     
-                    var url= '/actuales?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                    var url= '/actuales?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio + '&unidad=' + me.idunidad;
                     axios.get(url).then(function (response) {
                         var respuesta= response.data;
+                        console.log(respuesta);
                         me.arrayArticulo = respuesta.actuales.data;
                         me.pagination= respuesta.pagination;
                        
@@ -372,6 +399,13 @@
                 },
                 onChangeCodEstado(event) {
                     this.codestado = (event.target.value);
+                },
+                onChangeUnidad(event){
+                    this.arrayArticulo = [];
+                    this.idunidad=(event.target.value);
+                    const res = this.arrayUnidad.find((unidad) => unidad.unidad == this.idunidad);
+                    this.unidad= res.descrip;
+                    this.listarUnidad(1,this.buscar,this.criterio);
                 },
                 uploadImage(event) {
                     const files = event.target.files;
@@ -495,7 +529,7 @@
                 },
             mounted() {
                 this.listarArticulo(1,this.buscar,this.criterio);
-                this.listarGrupoContable();
+                this.listarUnidad();
             }
         }
     </script>

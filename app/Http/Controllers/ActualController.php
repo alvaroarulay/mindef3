@@ -31,29 +31,26 @@ class ActualController extends Controller
             $grupocontable = CodigoContable::All();
             $buscar = $request->buscar;
             $criterio = $request->criterio;
+            $unidad = $request->unidad; 
 
             if ($buscar==''){
             $actuales = Actual::join('codcont','actual.codcont','=','codcont.codcont')
             ->join('auxiliar',function ($join) {
                 $join->on('actual.codaux', '=', 'auxiliar.codaux');
-                    $join->on('actual.unidad', '=', 'auxiliar.unidad');
-                    $join->on('actual.codcont', '=', 'auxiliar.codcont');
+                $join->on('actual.codcont', '=', 'auxiliar.codcont');
             })
-            ->join('oficina',function ($join) {
-                $join->on('actual.codofic', '=', 'oficina.codofic');
-                    $join->on('actual.unidad', '=', 'oficina.unidad');
-            })
+            ->join('oficina','actual.codofic', '=', 'oficina.codofic')
             ->join('resp',function ($join) {
                 $join->on('actual.codresp', '=', 'resp.codresp');
-                    $join->on('actual.codofic', '=', 'resp.codofic');
-                    $join->on('actual.unidad', '=', 'resp.unidad');
+                $join->on('actual.codofic', '=', 'resp.codofic');
             })
             ->select('actual.id','actual.unidad','actual.codigo','codcont.nombre',
             'auxiliar.nomaux','actual.vidautil','oficina.nomofic','resp.nomresp',
             'actual.descripcion','actual.codestado','actual.estadoasignacion',
-            'actual.dia','actual.mes','actual.año','actual.costo','actual.costo_ant',
+            'actual.dia','actual.mes','actual.año','actual.costo','actual.costo_ant','actual.cod_rube',
             'actual.codigosec','actual.observ','actual.codcont','actual.codaux')
-            ->distinct('actual.id')->paginate(5);
+            ->where('actual.unidad','=',$unidad)
+            ->paginate(10);
             }
             else{
             $actuales = Actual::join('codcont','actual.codcont','=','codcont.codcont')
@@ -74,10 +71,9 @@ class ActualController extends Controller
             ->select('actual.id','actual.unidad','actual.codigo','codcont.nombre',
             'auxiliar.nomaux','actual.vidautil','oficina.nomofic','resp.nomresp',
             'actual.descripcion','actual.codestado','actual.estadoasignacion',
-            'actual.dia','actual.mes','actual.año','actual.costo','actual.costo_ant',
+            'actual.dia','actual.mes','actual.año','actual.costo','actual.costo_ant','actual.cod_rube',
             'actual.codigosec','actual.observ','actual.codcont','actual.codaux')
-            ->distinct('actual.id')
-            ->where('actual.'.$criterio, 'like', '%'. $buscar . '%')->paginate(5);           
+            ->where('actual.'.$criterio, 'like', '%'. $buscar . '%')->paginate(10);           
             }
             //return view('actuales.lista', ['actuales' => $actuales,'unidad'=>$unidad]);
             return [

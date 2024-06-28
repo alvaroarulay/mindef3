@@ -20,7 +20,7 @@ class ResponsableSeeder extends Seeder
         while ($record = $table->nextRecord()) {
             DB::table('resp')->insert([
             'entidad' =>$record->get('entidad'),
-            'unidad' =>$record->get('unidad'),
+            'unidad' =>'BAJAS',
             'codofic' =>$record->get('codofic'),
             'codresp' =>$record->get('codresp'),
             'nomresp' =>$record->get('nomresp'),

@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     viafzip(){
-      window.open('http://192.168.20.60/download-zipvsiaf');
+      window.open('http://mindef3.test/download-zipvsiaf');
     }
   }
 }
